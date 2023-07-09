@@ -17,6 +17,19 @@ typedef ssize_t     isize;
 #define SCREEN_WIDTH 800
 #define SCREEN_HEIGHT 600
 
+static u8 MAPDATA [8 * 8] = {
+    1, 1, 1, 1, 1, 1, 1, 1,
+    1, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 3, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 1, 0, 0, 0, 0, 1,
+    1, 0, 0, 0, 0, 0, 0, 1,
+    1, 0, 3, 0, 0, 0, 0, 1,
+    1, 1, 1, 1, 1, 1, 1, 1,
+};
+
+
+
 struct {
     SDL_Window *window;
     SDL_Texture *texture;
@@ -24,6 +37,18 @@ struct {
     u32 pixels[SCREEN_WIDTH * SCREEN_HEIGHT];
     bool quit;
 } state;
+
+static void verline(int x, int y0, int y1, u32 color){
+    for (int y = y0; y <= y1; y++){
+        state.pixels[(y * SCREEN_WIDTH) + x] = color;
+    }
+}
+
+static void render(){
+    for (usize x = 0; x < SCREEN_WIDTH; x++){
+        verline(x, 20, SCREEN_HEIGHT - 20, 0xFFFF0000 | (x & 0xFF));
+    }
+}
 
 int main(int argc, char*argv[])
 {
@@ -45,7 +70,11 @@ int main(int argc, char*argv[])
                                         -1, 
                                         SDL_RENDERER_PRESENTVSYNC);
 
-    state.texture = SDL_CreateTexture(state.renderer, SDL_PIXELFORMAT_ABGR8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
+    state.texture = SDL_CreateTexture(state.renderer, 
+                                      SDL_PIXELFORMAT_ABGR8888, 
+                                      SDL_TEXTUREACCESS_STREAMING, 
+                                      SCREEN_WIDTH, 
+                                      SCREEN_HEIGHT);
     
     if(state.texture == NULL){
         printf("Failed to create SDL texture:\n %s", SDL_GetError());
@@ -59,6 +88,8 @@ int main(int argc, char*argv[])
             if(SDL_QUIT == windowEvent.type)
             { break; }
         }
+
+        render();
 
         state.pixels[(10 * SCREEN_WIDTH + 5)] = 0xFFFF0FF;
 
