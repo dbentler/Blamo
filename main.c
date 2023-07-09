@@ -2,12 +2,26 @@
 #include <SDL2/SDL.h>
 #include <stdbool.h>
 
-const int SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600;
+typedef float       f32;
+typedef double      f64;
+typedef uint8_t     u8;
+typedef uint16_t    u16;
+typedef uint32_t    u32;
+typedef uint64_t    u64;
+typedef int8_t      i8;
+typedef int16_t     i16;
+typedef int32_t     i64;
+typedef size_t      usize;
+typedef ssize_t     isize;
+
+#define SCREEN_WIDTH 800
+#define SCREEN_HEIGHT 600
 
 struct {
     SDL_Window *window;
     SDL_Texture *texture;
     SDL_Renderer *renderer;
+    u32 pixels[SCREEN_WIDTH * SCREEN_HEIGHT];
     bool quit;
 } state;
 
@@ -45,11 +59,15 @@ int main(int argc, char*argv[])
             if(SDL_QUIT == windowEvent.type)
             { break; }
         }
-        SDL_SetRenderDrawColor(state.renderer, 0xFF, 0x00, 0xFF, 0xFF);
-        SDL_RenderClear(state.renderer);
+
+        state.pixels[(10 * SCREEN_WIDTH + 5)] = 0xFFFF0FF;
+
+        SDL_UpdateTexture(state.texture, NULL, state.pixels, SCREEN_WIDTH * 4);
+        SDL_RenderCopyEx(state.renderer, state.texture, NULL, NULL, 0.0, NULL, SDL_FLIP_VERTICAL);
         SDL_RenderPresent(state.renderer);
     }
 
+    SDL_DestroyTexture(state.texture);
     SDL_DestroyWindow(state.window);
     SDL_Quit();
     printf("SDL successfully quit.");
