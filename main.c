@@ -204,6 +204,27 @@ int main(int argc, char*argv[]) {
             if (event.type == SDL_QUIT) {
                 state.quit = true;
             }
+            if (event.type == SDL_MOUSEMOTION) {
+                int mouseX = event.motion.x;
+                int mouseY = event.motion.y;
+
+                // Calculate the difference in mouse position
+                int deltaX = mouseX - prevMouseX;
+
+                // Update the previous mouse position
+                prevMouseX = mouseX;
+
+                // Calculate the rotation speed
+                float rotationSpeed = 0.002f;
+
+                // Update camera direction and plane based on mouse movement
+                float prevDirX = playerDirX;
+                playerDirX = playerDirX * cosf(-deltaX * rotationSpeed) - playerDirY * sinf(-deltaX * rotationSpeed);
+                playerDirY = prevDirX * sinf(-deltaX * rotationSpeed) + playerDirY * cosf(-deltaX * rotationSpeed);
+                float prevPlaneX = playerPlaneX;
+                playerPlaneX = playerPlaneX * cosf(-deltaX * rotationSpeed) - playerPlaneY * sinf(-deltaX * rotationSpeed);
+                playerPlaneY = prevPlaneX * sinf(-deltaX * rotationSpeed) + playerPlaneY * cosf(-deltaX * rotationSpeed);
+            }
 
             if (event.type == SDL_KEYDOWN) {
                 // Handle camera movement
@@ -217,8 +238,8 @@ int main(int argc, char*argv[]) {
 
                             // Check if the next position is within a walkable area
                             if (MAPDATA[mapIndexY * 8 + mapIndexX] == 0 &&
-                                MAPDATA[mapIndexY * 8 + (usize)playerX] == 0 &&
-                                MAPDATA[(usize)playerY * 8 + mapIndexX] == 0) {
+                                MAPDATA[mapIndexY * 8 + (usize)(playerX + playerDirX * 0.1f)] == 0 &&
+                                MAPDATA[(usize)(playerY + playerDirY * 0.1f) * 8 + mapIndexX] == 0) {
                                 playerX = nextX;
                                 playerY = nextY;
                             }
@@ -233,8 +254,8 @@ int main(int argc, char*argv[]) {
 
                             // Check if the next position is within a walkable area
                             if (MAPDATA[mapIndexY * 8 + mapIndexX] == 0 &&
-                                MAPDATA[mapIndexY * 8 + (usize)playerX] == 0 &&
-                                MAPDATA[(usize)playerY * 8 + mapIndexX] == 0) {
+                                MAPDATA[mapIndexY * 8 + (usize)(playerX - playerDirX * 0.1f)] == 0 &&
+                                MAPDATA[(usize)(playerY - playerDirY * 0.1f) * 8 + mapIndexX] == 0) {
                                 playerX = nextX;
                                 playerY = nextY;
                             }
@@ -249,8 +270,8 @@ int main(int argc, char*argv[]) {
 
                             // Check if the next position is within a walkable area
                             if (MAPDATA[mapIndexY * 8 + mapIndexX] == 0 &&
-                                MAPDATA[mapIndexY * 8 + (usize)playerX] == 0 &&
-                                MAPDATA[(usize)playerY * 8 + mapIndexX] == 0) {
+                                MAPDATA[mapIndexY * 8 + (usize)(playerX - playerPlaneX * 0.1f)] == 0 &&
+                                MAPDATA[(usize)(playerY - playerPlaneY * 0.1f) * 8 + mapIndexX] == 0) {
                                 playerX = nextX;
                                 playerY = nextY;
                             }
@@ -265,37 +286,15 @@ int main(int argc, char*argv[]) {
 
                             // Check if the next position is within a walkable area
                             if (MAPDATA[mapIndexY * 8 + mapIndexX] == 0 &&
-                                MAPDATA[mapIndexY * 8 + (usize)playerX] == 0 &&
-                                MAPDATA[(usize)playerY * 8 + mapIndexX] == 0) {
+                                MAPDATA[mapIndexY * 8 + (usize)(playerX + playerPlaneX * 0.1f)] == 0 &&
+                                MAPDATA[(usize)(playerY + playerPlaneY * 0.1f) * 8 + mapIndexX] == 0) {
                                 playerX = nextX;
                                 playerY = nextY;
                             }
                         }
                     break;
                 }
-                if (event.type == SDL_MOUSEMOTION) {
-                    int mouseX = event.motion.x;
-                    int mouseY = event.motion.y;
 
-                    // Calculate the difference in mouse position
-                    int deltaX = mouseX - prevMouseX;
-                    int deltaY = mouseY - prevMouseY;
-
-                    // Update the previous mouse position
-                    prevMouseX = mouseX;
-                    prevMouseY = mouseY;
-
-                    // Calculate the rotation speed
-                    float rotationSpeed = 0.002f;
-
-                    // Update camera direction and plane based on mouse movement
-                    float prevDirX = playerDirX;
-                    playerDirX = playerDirX * cosf(-deltaX * rotationSpeed) - playerDirY * sinf(-deltaX * rotationSpeed);
-                    playerDirY = prevDirX * sinf(-deltaX * rotationSpeed) + playerDirY * cosf(-deltaX * rotationSpeed);
-                    float prevPlaneX = playerPlaneX;
-                    playerPlaneX = playerPlaneX * cosf(-deltaX * rotationSpeed) - playerPlaneY * sinf(-deltaX * rotationSpeed);
-                    playerPlaneY = prevPlaneX * sinf(-deltaX * rotationSpeed) + playerPlaneY * cosf(-deltaX * rotationSpeed);
-                }
             }
         }
 
